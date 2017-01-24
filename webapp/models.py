@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-db=SQLAlchemy()
 from datetime import datetime
+db=SQLAlchemy()
 
 # 关系表
 user_role = db.Table('user_role',  # 用户角色关联表
@@ -13,6 +13,7 @@ role_permission = db.Table('role_permission',  # 角色权限关联表
     db.Column('permission_id', db.Integer, db.ForeignKey('permission.id')),
     db.Column('role_id', db.Integer, db.ForeignKey('role.id')),
     db.Column('created_at', db.DateTime, default=datetime.now),
+    db.Column('is_delete',db.Boolean(),default=False)
 )
 
 role_menu = db.Table('role_menu',  # 用户菜单关联表
@@ -68,12 +69,17 @@ class RoleModel(db.Model):
     __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(20))
+    permissions=db.relationship(
+        'PermissionModel',secondary='role_permission',backref='roles'
+    )
+    is_delete=db.Column(db.Boolean(),default=False)
 
 class PermissionModel(db.Model):
     __tablename__ = 'permission'
     id = db.Column(db.Integer(),primary_key=True)
     name = db.Column(db.String(50))
     action = db.Column(db.String(250), unique=True)
+    is_delete=db.Column(db.Boolean(),default=False)
 
 class MenuModel(db.Model):
     __tablename__ = 'menu'
